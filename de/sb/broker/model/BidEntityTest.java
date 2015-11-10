@@ -15,7 +15,23 @@ public class BidEntityTest extends EntityTest{
 	@Test
 	public void TestLifeCycle() {
 		EntityManager em = this.getEntityManagerFactory().createEntityManager();
+		
+		//persist Person
 		em.getTransaction().begin();
+		Person person = this.createValidPersonEntity();
+		em.persist(person);
+		em.getTransaction().commit();
+		this.getWasteBasket().add(person.getIdentity());
+		
+//		//persist Auction
+//		em.getTransaction().begin();
+//		Auction auction = this.createValidPersonEntity();
+//		em.persist(person);
+//		em.getTransaction().commit();
+//		this.getWasteBasket().add(person.getIdentity());
+		
+		em.getTransaction().begin();
+		
 		
 		Bid bid = new Bid(new Auction(), this.createValidPersonEntity());
 		

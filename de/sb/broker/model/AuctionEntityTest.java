@@ -16,14 +16,19 @@ public class AuctionEntityTest extends EntityTest{
 	public void TestLifeCycle() {
 		EntityManager em = this.getEntityManagerFactory().createEntityManager();
 		em.getTransaction().begin();
-//		Person person = em.createQuery("SELECT Person FROM TABLE Person WHERE Person.Alias = 'WW'", Person.class)
-//                .getSingleResult();
-		Auction auction = new Auction(this.createValidPersonEntity());
+		
+		Person person = this.createValidPersonEntity();
+		em.persist(person);
+		em.getTransaction().commit();
+		this.getWasteBasket().add(person.getIdentity());
+		
+		em.getTransaction().begin();
+		Auction auction = new Auction(person);
 		auction.setTitle("Meth");
 		auction.setDescription("Good Shit");
-		
 		em.persist(auction);
 		em.getTransaction().commit();
+		
 		this.getWasteBasket().add(auction.getIdentity());
 		em.close();
 	}
