@@ -16,7 +16,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import bin.de.sb.broker.model.BaseEntity;
 import de.sb.java.TypeMetadata;
 
 
@@ -101,4 +100,22 @@ public abstract class EntityTest {
 			entityManager.close();
 		}
 	}
+	
+	public Person createValidPersonEntity(){
+		Person person = new Person();
+		person.setAlias("WW6");
+		person.getName().setFamily("White");
+		person.getName().setGiven("Walter");
+		person.getAddress().setStreet("Simon-Dach.Straße");
+		person.getAddress().setCity("Berlin");
+		person.getAddress().setPostcode("10245");
+		person.getContact().setEmail("ww@web.au");
+		person.getContact().setPhone("017812345678");
+		return person;
+	}
+	
+//	public Auction createValidAuctionEntity(){
+//		Auction auction = new Auction();
+//		auction.
+//	}
 }
