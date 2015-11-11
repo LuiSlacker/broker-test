@@ -27,13 +27,16 @@ public class MainTest extends EntityTest{
 //		Person person = generatePerson();
 //		createPerson(person);
 		
-		Auction auction = generateAuction();
-		createAuction(auction);
+//		Auction auction = generateAuction();
+//		createAuction(auction);
 		
+		Bid bid = generateBid();
+		createBid(bid);
 		
 		em.getTransaction().commit();
 //		wasteBasket.add(person.getIdentity());
-		wasteBasket.add(auction.getIdentity());
+//		wasteBasket.add(auction.getIdentity());
+		wasteBasket.add(bid.getIdentity());
 		em.close();
 	}
 	
@@ -55,6 +58,11 @@ public class MainTest extends EntityTest{
 		auction.setTitle("title");
 		auction.setDescription("desc");
 		return auction;
+	}
+	
+	public static Bid generateBid(){
+		Bid bid = new Bid(generateAuction(), generatePerson());
+		return bid;
 	}
 	
 	public static void createPerson(Person person) {
@@ -86,6 +94,22 @@ public class MainTest extends EntityTest{
 	        }
 	    } else{
 	        em.persist(auction);
+	    }
+	}
+	
+	public static void createBid(Bid bid) {
+
+	    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+	    Validator validator = factory.getValidator();
+	    Set<ConstraintViolation<Bid>> constraintViolations = validator.validate(bid);
+	    if(constraintViolations.size() > 0){
+	        Iterator<ConstraintViolation<Bid>> iterator = constraintViolations.iterator();
+	        while(iterator.hasNext()){
+	            ConstraintViolation<Bid> cv = iterator.next();
+	            System.err.println(cv.getRootBeanClass().getName()+"."+cv.getPropertyPath() + " " +cv.getMessage());
+	        }
+	    } else{
+	        em.persist(bid);
 	    }
 	}
 	

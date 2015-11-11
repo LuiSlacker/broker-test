@@ -17,12 +17,10 @@ public class AuctionEntityTest extends EntityTest{
 		EntityManager em = this.getEntityManagerFactory().createEntityManager();
 		em.getTransaction().begin();
 		
-		Person person = this.createValidPersonEntity();
-		em.persist(person);
-		em.getTransaction().commit();
-		this.getWasteBasket().add(person.getIdentity());
+		// grab a instance of Person
+		Person person = em.getReference(Person.class, 1l);
 		
-		em.getTransaction().begin();
+		// construct new Auction
 		Auction auction = new Auction(person);
 		auction.setTitle("Meth");
 		auction.setDescription("Good Shit");
@@ -44,6 +42,12 @@ public class AuctionEntityTest extends EntityTest{
 		auction.setDescription("BLA BLA");
 		constrainViolations = validator.validate(auction);
 		assertEquals(constrainViolations.size(), 0);
+		
+		auction.setTitle("");
+		auction.setDescription("");
+		constrainViolations = validator.validate(auction);
+		assertEquals(constrainViolations.size(), 2);
+		
 	}
 
 }

@@ -2,9 +2,11 @@ package de.sb.broker.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -16,24 +18,16 @@ public class BidEntityTest extends EntityTest{
 	public void TestLifeCycle() {
 		EntityManager em = this.getEntityManagerFactory().createEntityManager();
 		
-		//persist Person
 		em.getTransaction().begin();
-		Person person = this.createValidPersonEntity();
-		em.persist(person);
-		em.getTransaction().commit();
-		this.getWasteBasket().add(person.getIdentity());
+		//grab a instance of Person (Ines)
+		Person person = em.find(Person.class, 1l);
 		
-//		//persist Auction
-//		em.getTransaction().begin();
-//		Auction auction = this.createValidPersonEntity();
-//		em.persist(person);
-//		em.getTransaction().commit();
-//		this.getWasteBasket().add(person.getIdentity());
+		//grab a instance of Auction with seller Sascha
+		TypedQuery<Auction> query = em.createQuery("SELECT a FROM Auction a", Auction.class);
+		List<Auction> allAuctions = query.getResultList();
 		
-		em.getTransaction().begin();
-		
-		
-		Bid bid = new Bid(new Auction(), this.createValidPersonEntity());
+		// construct new Bid
+		Bid bid = new Bid(allAuctions.get(4), person);
 		
 		em.persist(bid);
 		em.getTransaction().commit();
