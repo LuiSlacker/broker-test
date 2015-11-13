@@ -5,16 +5,19 @@ import static org.junit.Assert.assertEquals;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class AuctionEntityTest extends EntityTest{
 
-	@Test
+	EntityManager em = this.getEntityManagerFactory().createEntityManager();
+	
+	@Test(expected = EntityNotFoundException.class)
 	public void TestLifeCycle() {
-		EntityManager em = this.getEntityManagerFactory().createEntityManager();
 		em.getTransaction().begin();
 		
 		// grab a instance of Person
@@ -26,9 +29,22 @@ public class AuctionEntityTest extends EntityTest{
 		auction.setDescription("Good Shit");
 		em.persist(auction);
 		em.getTransaction().commit();
-		
 		this.getWasteBasket().add(auction.getIdentity());
-		em.close();
+		
+		//test if Entity exists in DB
+		auction = em.getReference(Auction.class, auction.getIdentity());
+		assertEquals(auction.getTitle(), "Meth");
+		
+		em.getTransaction().begin();
+		em.remove(auction);
+		em.getTransaction().commit();
+		
+		auction = em.getReference(Auction.class, auction.getIdentity());
+	}
+	
+	@After
+	public void finializeTests(){
+		if (em.isOpen()) em.close();
 	}
 	
 	@Test

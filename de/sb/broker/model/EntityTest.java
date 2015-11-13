@@ -103,13 +103,13 @@ public abstract class EntityTest {
 	
 	public Person createValidPersonEntity(){
 		Person person = new Person();
-		person.setAlias("WW8");
+		person.setAlias("WW9");
 		person.getName().setFamily("White");
 		person.getName().setGiven("Walter");
 		person.getAddress().setStreet("Simon-Dach.Straße");
 		person.getAddress().setCity("Berlin");
 		person.getAddress().setPostcode("10245");
-		person.getContact().setEmail("ww@web.ag");
+		person.getContact().setEmail("ww@web.ap");
 		person.getContact().setPhone("017812345678");
 		return person;
 	}

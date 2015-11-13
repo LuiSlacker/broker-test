@@ -6,17 +6,19 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.TypedQuery;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class BidEntityTest extends EntityTest{
+	EntityManager em = this.getEntityManagerFactory().createEntityManager();
 
-	@Test
+	@Test(expected = EntityNotFoundException.class)
 	public void TestLifeCycle() {
-		EntityManager em = this.getEntityManagerFactory().createEntityManager();
 		
 		em.getTransaction().begin();
 		//grab a instance of Person (Ines)
@@ -32,7 +34,20 @@ public class BidEntityTest extends EntityTest{
 		em.persist(bid);
 		em.getTransaction().commit();
 		this.getWasteBasket().add(bid.getIdentity());
-		em.close();
+		
+		bid = em.getReference(Bid.class, bid.getIdentity());
+		assertEquals(bid.getBidder(), person);
+		
+		em.getTransaction().begin();
+		em.remove(bid);
+		bid = em.getReference(Bid.class, bid.getIdentity());
+		em.getTransaction().commit();
+		
+	}
+	
+	@After
+	public void finializeTests(){
+		if (em.isOpen()) em.close();
 	}
 	
 	@Test

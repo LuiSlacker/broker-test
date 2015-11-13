@@ -5,23 +5,42 @@ import static org.junit.Assert.assertEquals;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.junit.After;
 import org.junit.Test;
 
 
 public class PersonEntityTest extends EntityTest{
 
-	@Test
+	private final EntityManager em = this.getEntityManagerFactory().createEntityManager();
+	
+	@Test(expected = EntityNotFoundException.class)
 	public void TestLifeCycle() {
-		EntityManager em = this.getEntityManagerFactory().createEntityManager();
-		em.getTransaction().begin();
+		//persist person entity
 		Person person = this.createValidPersonEntity();
+		em.getTransaction().begin();
 		em.persist(person);
 		em.getTransaction().commit();
 		this.getWasteBasket().add(person.getIdentity());
-		em.close();
+		
+		//test if Entity exists in DB
+		person = em.getReference(Person.class, person.getIdentity());
+		assertEquals(person.getName().getFamily(), "White");
+		
+		// test if Entity has been deleted properly
+		em.getTransaction().begin();
+		em.remove(person);
+		em.getTransaction().commit();
+
+		person = em.getReference(Person.class, person.getIdentity());
+	}
+
+	@After
+	public void finializeTests(){
+		if (em.isOpen()) em.close();
 	}
 	
 	@Test
