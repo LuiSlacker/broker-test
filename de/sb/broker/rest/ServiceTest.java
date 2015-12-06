@@ -1,6 +1,7 @@
 package de.sb.broker.rest;
 
 import static java.util.logging.Level.INFO;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,8 +10,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -21,7 +26,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
 import com.sun.net.httpserver.HttpServer;
+
+import de.sb.broker.model.Person;
 
 
 /**
@@ -33,6 +41,7 @@ import com.sun.net.httpserver.HttpServer;
 public class ServiceTest {
 	static private final URI SERVICE_URI = URI.create("http://localhost:8001/services");
 	static private HttpServer HTTP_CONTAINER = null;
+	static EntityManager em;
 
 	private final Set<Long> wasteBasket = new HashSet<>();
 
@@ -83,7 +92,24 @@ public class ServiceTest {
 
 		return ClientBuilder.newClient(configuration).target(SERVICE_URI);
 	}
-
+	
+	protected Person createValidPersonEntity(){
+		Person person = new Person();
+		person.setAlias("TT");
+		person.getName().setFamily("Tester");
+		person.getName().setGiven("Test");
+		person.getAddress().setStreet("Testweg 1");
+		person.getAddress().setCity("Testhausen");
+		person.getAddress().setPostcode("10245");
+		person.getContact().setEmail("test@tester.de");
+		person.getContact().setPhone("015212345678");
+		return person;
+	}
+	
+	@BeforeClass
+	public static void createEntityManager(){
+		em = Persistence.createEntityManagerFactory("broker").createEntityManager();
+	}
 
 	/**
 	 * Creates an embedded REST service container. This operation is run once before any of the test

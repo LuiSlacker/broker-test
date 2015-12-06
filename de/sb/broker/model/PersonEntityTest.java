@@ -12,12 +12,14 @@ import javax.validation.Validator;
 import org.junit.After;
 import org.junit.Test;
 
+import junit.framework.Assert;
+
 
 public class PersonEntityTest extends EntityTest{
 
 	private final EntityManager em = this.getEntityManagerFactory().createEntityManager();
 	
-	@Test(expected = EntityNotFoundException.class)
+	@Test
 	public void TestLifeCycle() {
 		//persist person entity
 		Person person = this.createValidPersonEntity();
@@ -26,16 +28,24 @@ public class PersonEntityTest extends EntityTest{
 		em.getTransaction().commit();
 		this.getWasteBasket().add(person.getIdentity());
 		
+		em.getTransaction().begin();
 		//test if Entity exists in DB
 		person = em.getReference(Person.class, person.getIdentity());
 		assertEquals(person.getName().getFamily(), "White");
 		
 		// test if Entity has been deleted properly
-		em.getTransaction().begin();
 		em.remove(person);
 		em.getTransaction().commit();
 
-		person = em.getReference(Person.class, person.getIdentity());
+		em.getTransaction().begin();
+		try {
+			person = em.getReference(Person.class, person.getIdentity());
+			Assert.fail();
+		} catch(EntityNotFoundException e){
+			//ok
+		} finally {
+		}
+		em.getTransaction().commit();
 	}
 
 	@After
