@@ -116,8 +116,14 @@ public class PersonServiceTest extends ServiceTest{
 		assertEquals(404, status);
 	}
 	
+	
 	@Test
-	public void testBidRelations() {
+	public void testAuctionRelationQueries() {
+		//TODO
+	}
+	
+	@Test
+	public void testBidRelationQueries() {
 		//TODO
 	}
 	
@@ -128,4 +134,10 @@ public class PersonServiceTest extends ServiceTest{
 		Person p = response.readEntity(Person.class);
 		assertEquals("Ines", p.getName().getGiven());
 	}
+	
+	@Test
+	public void testLifeCycle() {
+		//TODO
+	}
+	
 }
