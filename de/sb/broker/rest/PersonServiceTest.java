@@ -78,7 +78,7 @@ public class PersonServiceTest extends ServiceTest{
 		assertEquals("Tester", all.get(0).getName().getFamily());
 		
 		//test QueryParam "creationtimeLower"
-		webTarget = newWebTarget("ines", "ines").path("people/").queryParam("creationtimeLower", System.currentTimeMillis()-1000);
+		webTarget = newWebTarget("ines", "ines").path("people/").queryParam("creationtimeLower", System.currentTimeMillis()-1000*60);
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Person>>() {});
 		assertEquals("Tester", all.get(0).getName().getFamily());

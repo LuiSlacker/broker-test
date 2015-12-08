@@ -28,8 +28,8 @@ public class PersonEntityTest extends EntityTest{
 		em.getTransaction().commit();
 		this.getWasteBasket().add(person.getIdentity());
 		
-		em.getTransaction().begin();
 		//test if Entity exists in DB
+		em.getTransaction().begin();
 		person = em.getReference(Person.class, person.getIdentity());
 		assertEquals(person.getName().getFamily(), "White");
 		
@@ -45,7 +45,6 @@ public class PersonEntityTest extends EntityTest{
 			//ok
 		} finally {
 		}
-		em.getTransaction().commit();
 	}
 
 	@After

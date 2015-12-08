@@ -24,18 +24,22 @@ public class AuctionServiceTest extends ServiceTest{
 		
 		//persist person and auction entity
 		Person person = this.createValidPersonEntity();
+		em.getTransaction().begin();
+		em.persist(person);
+		em.getTransaction().commit();
+
 		Auction auction = new Auction(person);
 		auction.setTitle("Testauction");
 		auction.setDescription("Test description");
-		auction.setAskingPrice(1);
-		auction.setClosureTimestamp(1);
-		auction.setUnitCount((short) 1);
-		
+		auction.setUnitCount((short)10000);
+		auction.setAskingPrice(11111);
+				
 		em.getTransaction().begin();
 		em.persist(auction);
 		em.getTransaction().commit();
+		this.getWasteBasket().add(person.getIdentity());
 		this.getWasteBasket().add(auction.getIdentity());
-				
+
 		//test QueryParam "title"
 		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("title", "Testauction");
 		Response response = webTarget.request().get();
@@ -43,65 +47,69 @@ public class AuctionServiceTest extends ServiceTest{
 		assertEquals("Test description", all.get(0).getDescription());
 		
 		//test QueryParam "UCLower"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("UCLower", "0");
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("UCLower", 9999);
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getUnitCount());
+		assertTrue(9999 <= all.get(0).getUnitCount());
 		
-		//test QueryParam "UCUpper"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("UCUpper", "2");
-		response = webTarget.request().get();
-		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getUnitCount());
+//		//test QueryParam "UCUpper"
+//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("UCUpper", 40000);
+//		response = webTarget.request().get();
+//		all = response.readEntity(new GenericType<List<Auction>>() {});
+//		assertTrue(40000 >= all.get(0).getUnitCount());
+
 		
 		//test QueryParam "priceLower"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("priceLower", "0");
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("priceLower", 11110);
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getAskingPrice());
+		assertTrue(11110 <= all.get(0).getAskingPrice());
+
 		
 		//test QueryParam "priceUpper"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("priceUpper", "2");
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("priceUpper", 11112);
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getAskingPrice());
+		assertTrue(11112 >= all.get(0).getAskingPrice());
 		
-//		TODO: check if correct 
-//		//test QueryParam "resultOffset"
-//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("resultOffset", "1");
+		//test QueryParam "resultOffset"
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("resultOffset", 0);
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Auction>>() {});
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("resultOffset", 1);
+		response = webTarget.request().get();
+		List<Auction> allWithResultOffset1 = response.readEntity(new GenericType<List<Auction>>() {});
+		assertEquals(all.size(), allWithResultOffset1.size()+1);
+		
+		//test QueryParam "resultLength"
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("resultLength", 2);
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Auction>>() {});
+		assertEquals(2, all.size());
+		
+		//test QueryParam "creationtimeLower"
+//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("creationtimeLower", System.currentTimeMillis()-1000*60);
 //		response = webTarget.request().get();
 //		all = response.readEntity(new GenericType<List<Auction>>() {});
-//		assertEquals("1", all.get(0).getAskingPrice());
-//		
-//		//test QueryParam "resultLength"
-//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("resultLength", "2");
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Auction>>() {});
-//		assertEquals("1", all.get(0).getAskingPrice());
-//		
-//		//test QueryParam "creationtimeLower"
-//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("creationtimeLower", "");
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Auction>>() {});
-//		assertEquals("1", all.get(0).getAskingPrice());
-//		
+//		assertEquals("Test description", all.get(0).getDescription());
+		
 //		//test QueryParam "creationtimeUpper"
-//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("creationtimeUpper", "");
+//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("creationtimeUpper", System.currentTimeMillis()+1000);
 //		response = webTarget.request().get();
 //		all = response.readEntity(new GenericType<List<Auction>>() {});
-//		assertEquals("1", all.get(0).getAskingPrice());
-		
-		//test QueryParam "closuretimeLower"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("closuretimeLower", "0");
-		response = webTarget.request().get();
-		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getClosureTimestamp());
+//		assertEquals("Test description", all.get(0).getDescription());
+//		
+////		//test QueryParam "closuretimeLower"
+//		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("closuretimeLower", System.currentTimeMillis());
+//		response = webTarget.request().get();
+//		all = response.readEntity(new GenericType<List<Auction>>() {});
+//		assertTrue(System.currentTimeMillis() <= all.get(0).getClosureTimestamp());
 		
 		//test QueryParam "closuretimeUpper"
-		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("closuretimeUpper", "2");
+		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("closuretimeUpper", System.currentTimeMillis() + 48*60*60*1000);
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("1", all.get(0).getClosureTimestamp());
+		assertTrue((System.currentTimeMillis()+ 48*60*60*1000) >= all.get(0).getClosureTimestamp());
 		
 		//test QueryParam "descriptionFrag"
 		webTarget = newWebTarget("ines", "ines").path("auctions/").queryParam("descriptionFrag", "description");
@@ -118,16 +126,17 @@ public class AuctionServiceTest extends ServiceTest{
 		
 		//persist person and auction entity
 		Person person = this.createValidPersonEntity();
+		em.getTransaction().begin();
+		em.persist(person);
+		em.getTransaction().commit();
+
 		Auction auction = new Auction(person);
 		auction.setTitle("Testauction");
 		auction.setDescription("Test description");
-		auction.setAskingPrice(1);
-		auction.setClosureTimestamp(1);
-		auction.setUnitCount((short) 1);
-
 		em.getTransaction().begin();
 		em.persist(auction);
 		em.getTransaction().commit();
+		this.getWasteBasket().add(person.getIdentity());
 		this.getWasteBasket().add(auction.getIdentity());
 
 		// test valid entity
