@@ -123,8 +123,6 @@ public class ServiceTest {
 			em.remove(people.get(0));
 			em.getTransaction().commit();
 		};
-		
-		
 	}
 
 	/**

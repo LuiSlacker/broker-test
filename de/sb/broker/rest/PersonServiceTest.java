@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -14,6 +15,7 @@ import org.glassfish.jersey.client.ClientResponse;
 import org.junit.Test;
 
 import de.sb.broker.model.Auction;
+import de.sb.broker.model.Bid;
 import de.sb.broker.model.Person;
 
 public class PersonServiceTest extends ServiceTest{
@@ -21,8 +23,7 @@ public class PersonServiceTest extends ServiceTest{
 	
 	@Test
 	public void testCriteriaQueries() {
-		
-		
+				
 		//persist person entity with alias='TTTT' & pwd='secret'
 		Person person = this.createValidPersonEntity();
 		em.getTransaction().begin();
@@ -64,36 +65,36 @@ public class PersonServiceTest extends ServiceTest{
 		response = webTarget.request().get();
 		all = response.readEntity(new GenericType<List<Person>>() {});
 		assertEquals("Tester", all.get(0).getName().getFamily());
-//		
-//		//test QueryParam "street"
-//		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("street", "Testweg 1");
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Person>>() {});
-//		assertEquals("Tester", all.get(0).getName().getFamily());
-//		
-//		//test QueryParam "postcode"
-//		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("postcode", "10245");
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Person>>() {});
-//		assertEquals("Tester", all.get(0).getName().getFamily());
-//		
-//		//test QueryParam "city"
-//		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("city", "Testhausen");
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Person>>() {});
-//		assertEquals("Tester", all.get(0).getName().getFamily());
-//		
-//		//test QueryParam "creationtimeLower"
-//		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("creationtimeLower", System.currentTimeMillis()-1000*60);
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Person>>() {});
-//		assertEquals("Tester", all.get(0).getName().getFamily());
-//		
-//		//test QueryParam "creationtimeUpper"
-//		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("creationtimeUpper", System.currentTimeMillis()+1000);
-//		response = webTarget.request().get();
-//		all = response.readEntity(new GenericType<List<Person>>() {});
-//		assertEquals("Tester", all.get(0).getName().getFamily());
+		
+		//test QueryParam "street"
+		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("street", "Testweg 1");
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Person>>() {});
+		assertEquals("Tester", all.get(0).getName().getFamily());
+		
+		//test QueryParam "postcode"
+		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("postcode", "10245");
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Person>>() {});
+		assertEquals("Tester", all.get(0).getName().getFamily());
+		
+		//test QueryParam "city"
+		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("city", "Testhausen");
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Person>>() {});
+		assertEquals("Tester", all.get(0).getName().getFamily());
+		
+		//test QueryParam "creationtimeLower"
+		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("creationtimeLower", System.currentTimeMillis()-1000*60);
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Person>>() {});
+		assertEquals("Tester", all.get(0).getName().getFamily());
+		
+		//test QueryParam "creationtimeUpper"
+		webTarget = newWebTarget("TTTT", "secret").path("people/").queryParam("creationtimeUpper", System.currentTimeMillis()+1000);
+		response = webTarget.request().get();
+		all = response.readEntity(new GenericType<List<Person>>() {});
+		assertEquals("Tester", all.get(0).getName().getFamily());
 	}
 	
 	@Test
@@ -124,42 +125,18 @@ public class PersonServiceTest extends ServiceTest{
 	
 	@Test
 	public void testAuctionRelationQueries() {
-		
-		//persist person entity with alias='TTTT' & pwd='secret'
-		Person person = this.createValidPersonEntity();
-		em.getTransaction().begin();
-		em.persist(person);
-		em.getTransaction().commit();
-		this.getWasteBasket().add(person.getIdentity());
-		
-		//persist auction entity
-		Auction auction = new Auction(person);
-		auction.setTitle("Testauction");
-		auction.setDescription("Test description");
-		em.getTransaction().begin();
-		em.persist(auction);
-		em.getTransaction().commit();
-		this.getWasteBasket().add(auction.getIdentity());
-		
-		WebTarget webTarget = newWebTarget("TTTT", "secret").path("people/" + person.getIdentity());
+		WebTarget webTarget = newWebTarget("sascha", "sascha").path("people/1/auctions").queryParam("title", "Rennrad wie neu");
 		Response response = webTarget.request().get();
-		Person p = response.readEntity(Person.class);
-		assertEquals("Test", p.getName().getGiven());
-		
-		webTarget = newWebTarget("TTTT", "secret").path("people/" + person.getIdentity() + "/auctions");
-		response = webTarget.request().get();
 		List<Auction> all = response.readEntity(new GenericType<List<Auction>>() {});
-		assertEquals("Testauction", all.get(0).getTitle());
+		assertEquals("Rennrad wie neu", all.get(0).getTitle());
 	}
 	
 	@Test
 	public void testBidRelationQueries() {
-//		///persist person entity with alias='TTTT' & pwd='secret'
-//		Person person = this.createValidPersonEntity();
-//		em.getTransaction().begin();
-//		em.persist(person);
-//		em.getTransaction().commit();
-//		this.getWasteBasket().add(person.getIdentity());
+		WebTarget webTarget = newWebTarget("sascha", "sascha").path("people/1/bids");
+		Response response = webTarget.request().get();
+		List<Bid> all = response.readEntity(new GenericType<List<Bid>>() {});
+		assertEquals(1, all.get(0).getPrice());
 		
 	}
 	
@@ -181,15 +158,7 @@ public class PersonServiceTest extends ServiceTest{
 	@Test
 	public void testLifeCycle() {
 //		WebTarget webTarget = newWebTarget("ines", "ines").path("people/");
-//		Person p = new Person();
-//		p.setAlias("Blubbbb");
-//		p.getName().setFamily("sdfs");
-//		p.getName().setGiven("sssdf");
-//		p.getContact().setEmail("a@b.desss");
-//		p.getAddress().setCity("Hometown");
-//		final ClientResponse response = webTarget.request().post(ClientResponse.class, Person.class);
-//		Person p = response.readEntity(Person.class);
-//		assertEquals("Test", p.getName().getGiven());
+//		final Response response = webTarget.request().put(ClientResponse.class, "<customer>...</customer>");
 	}
 	
 }
