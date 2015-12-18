@@ -8,11 +8,13 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
@@ -51,7 +53,7 @@ public class ServiceTest {
 	 * @return the identities of entities to be deleted after each test
 	 */
 	public Set<Long> getWasteBasket() {
-		return this.wasteBasket;
+		return wasteBasket;
 	}
 
 
@@ -95,20 +97,34 @@ public class ServiceTest {
 	
 	protected Person createValidPersonEntity(){
 		Person person = new Person();
-		person.setAlias("TT");
+		person.setAlias("TTTT");
 		person.getName().setFamily("Tester");
 		person.getName().setGiven("Test");
 		person.getAddress().setStreet("Testweg 1");
 		person.getAddress().setCity("Testhausen");
 		person.getAddress().setPostcode("10245");
-		person.getContact().setEmail("test@tester.de");
+		person.getContact().setEmail("test@tester.org");
 		person.getContact().setPhone("015212345678");
+		person.setPasswordHash("secret");
 		return person;
 	}
 	
 	@BeforeClass
-	public static void createEntityManager(){
+	public static void BeforeClass(){
 		em = Persistence.createEntityManagerFactory("broker").createEntityManager();
+		
+		TypedQuery<Person> query = em.createQuery("select p from Person as p WHERE"
+				+ "(p.alias = :alias)", Person.class);
+
+		query.setParameter("alias", "TTTT");
+		List<Person> people = query.getResultList();
+		if (people.size() > 0){
+			em.getTransaction().begin();
+			em.remove(people.get(0));
+			em.getTransaction().commit();
+		};
+		
+		
 	}
 
 	/**
